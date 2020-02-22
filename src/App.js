@@ -1,8 +1,7 @@
-import React, {useState, useEffect} from 'react';
-import './App.css';
-import axios from 'axios';
-import styled from 'styled-components';
-import Table from './Table';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import styled from "styled-components";
+import Table from "./Table";
 
 const StyledInput = styled.input`
   height: 90px;
@@ -26,51 +25,49 @@ const StyledButton = styled.button`
   height: 110px;
 `;
 
+const BodyWrapper = styled.div`
+  display: grid;
+  grid-template-columns: 5fr 1fr;
+  margin: 10px 30px;
+`;
+
+const AppWrapper = styled.div`
+  text-align: center;
+  display: grid;
+  grid-template-rows: 1fr auto 5fr;
+  background-color: #f0efd1;
+`;
+const AppHeader = styled.header`
+  min-height: 20vh;
+  display: grid;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: #f9f8cc;
+  background-color: #323310;
+  font-size: 38px;
+`;
+
 function App() {
-  const [city, setCity] = useState('Toronto');
+  const [city, setCity] = useState("Toronto");
   const [restaurants, setRestaurants] = useState([]);
-  const [countryRestaurants, setCountryRestaurants] = useState([]);
 
   useEffect(() => getOpen(city), []);
-  useEffect(() => getAll(), []);
 
   const getOpen = city => {
     axios({
-      method: 'get',
+      method: "get",
       url: `https://opentable.herokuapp.com/api/restaurants?city=${city}`
     }).then(response => {
       return setRestaurants(response.data.restaurants);
     });
   };
 
-  var proxyUrl = 'https://cors-anywhere.herokuapp.com/',
-    targetUrl = `https://platform.otqa.com/sync/directory?country=CA`;
-
-  const getAll = () => {
-    fetch(proxyUrl + targetUrl, {
-      method: 'GET',
-      headers: {
-        Authorization: 'bearer 27ae8298-b654-40ce-aa41-856fbec436c8',
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-        'Access-Control-Allow-Origin': '*'
-      }
-    })
-      .then(response => response.json())
-      .then(response => setCountryRestaurants(response));
-  };
-
   return (
-    <div className="App">
-      <header className="App-header">Opentables available in {city}</header>
-
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: '5fr 1fr',
-          margin: '10px 30px'
-        }}
-      >
+    <AppWrapper>
+      <AppHeader>Opentables available in {city}</AppHeader>
+      <BodyWrapper>
         <StyledInput
           aria-label="Input for city"
           type="text"
@@ -79,21 +76,15 @@ function App() {
           }}
           placeholder="Enter Your City"
         />
-
         <StyledButton
           aria-label="Search Restaurants Button"
           onClick={() => getOpen(city)}
         >
           Get Restaurants
         </StyledButton>
-      </div>
-      {restaurants && (
-        <Table
-          restaurants={restaurants}
-          countryRestaurants={countryRestaurants}
-        />
-      )}
-    </div>
+      </BodyWrapper>
+      {restaurants && <Table restaurants={restaurants} />}
+    </AppWrapper>
   );
 }
 
